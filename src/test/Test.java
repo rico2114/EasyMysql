@@ -59,6 +59,16 @@ public class Test {
 			public void onFetch(ResultSet resultSet) {
 				System.out.println("A synchronous fetching");
 			}
+
+			@Override
+			public void onPushException(SQLException exception) {
+				System.out.println("exception during pushing!");
+			}
+
+			@Override
+			public void onFetchException(SQLException exception) {
+				System.out.println("exception during fetching");
+			}
 			
 		};
 		final EasyMysqlAsynchronous asMysql = new EasyMysqlAsynchronous(connection, handler);

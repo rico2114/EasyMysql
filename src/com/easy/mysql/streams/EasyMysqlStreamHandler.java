@@ -25,11 +25,15 @@ public interface EasyMysqlStreamHandler {
 	 * Called when an exception gets thrown during pushing
 	 * @param exception	the exception
 	 */
-	void onPushException(final SQLException exception);
+	default void onPushException(final SQLException exception) {
+		// Empty by default, override if needed
+	}
 	
 	/**
 	 * Called when an exception gets thrown during fetching
 	 * @param exception	the exception
 	 */
-	void onFetchException(final SQLException exception);
+	default void onFetchException(final SQLException exception) {
+		// Empty by default, override if needed
+	}
 }

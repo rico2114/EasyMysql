@@ -44,7 +44,7 @@ public class EasyMysqlAsynchronousFetch implements EasyMysqlFetch {
 							final ResultSet resultSet = statement.executeQuery(context.getStream().toString());
 							context.getHandler().onFetch(resultSet);
 						} catch (SQLException e) {
-							e.printStackTrace();
+							context.getHandler().onFetchException(e);
 						}
 					}
 				}

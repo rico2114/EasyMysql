@@ -1,6 +1,7 @@
 package com.easy.mysql.streams;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * Created with eclipse 27/01/2015 11:43:10 p. m.
@@ -19,4 +20,16 @@ public interface EasyMysqlStreamHandler {
 	 * @param resultSet	the result set
 	 */
 	void onFetch(final ResultSet resultSet);
+	
+	/**
+	 * Called when an exception gets thrown during pushing
+	 * @param exception	the exception
+	 */
+	void onPushException(final SQLException exception);
+	
+	/**
+	 * Called when an exception gets thrown during fetching
+	 * @param exception	the exception
+	 */
+	void onFetchException(final SQLException exception);
 }

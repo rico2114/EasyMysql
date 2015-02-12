@@ -70,7 +70,10 @@ public class EasyMysql<T extends EasyMysqlFetch> extends EasyMysqlFetchableStrea
 					handler.onPush(this);
 				}
 			} catch (SQLException e) {
-				e.printStackTrace();
+				if (Objects.nonNull(handler))
+					handler.onPushException(e);
+				else
+					e.printStackTrace();
 			}
 		}
 	}

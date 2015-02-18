@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import com.easy.mysql.EasyMysql;
 import com.easy.mysql.streams.EasyMysqlStreamHandler;
 import com.easy.mysql.streams.EasyMysqlStreamInterface;
 import com.easy.mysql.streams.impl.EasyMysqlAsynchronous;
@@ -17,6 +18,8 @@ import com.easy.mysql.streams.property.EasyMysqlProperty;
  */
 public class Test {
 	
+	private static final boolean TEST_ASYNCHRONOUS_FETCHING = true;
+	
 	public static void main(String[] args) {
 		// Set our connection
 		Connection connection = null;
@@ -26,21 +29,20 @@ public class Test {
 			e.printStackTrace();
 		}
 		// synchronous fetching
-		testSync(connection);
+		if (!TEST_ASYNCHRONOUS_FETCHING)
+			testSync(connection);
+		else
 		// asynchronous fetching
 		testAsync(connection);
 	}
 	
 	public static void testSync(final Connection connection) {
 		final EasyMysqlSynchronous sMysql = new EasyMysqlSynchronous(connection);
-		sMysql.insertInto("Usernames", new EasyMysqlProperty("Name", "Juan"), new EasyMysqlProperty("Name", "Pedro"));
-		sMysql.push();
-		
-		sMysql.clear().selectFrom("Usernames").where(new EasyMysqlProperty("Name", "Pedro"));
+		insertDataAndPrepareForFetching(sMysql);
 		final ResultSet rs = sMysql.getFetching().fetch(sMysql);
 		try {
 			while (rs.next()) {
-				
+				// Grab details here, use rs as favour
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -72,9 +74,13 @@ public class Test {
 			
 		};
 		final EasyMysqlAsynchronous asMysql = new EasyMysqlAsynchronous(connection, handler);
-		asMysql.insertInto("Usernames", new EasyMysqlProperty("Name", "Juan"), new EasyMysqlProperty("Name", "Pedro"));
-		asMysql.push();
-		asMysql.clear().selectFrom("Usernames").where(new EasyMysqlProperty("Name", "Pedro"));
+		insertDataAndPrepareForFetching(asMysql);
 		asMysql.getFetching().fetch(asMysql);
+	}
+	
+	public static void insertDataAndPrepareForFetching(final EasyMysql<?> mysql) {
+		mysql.insertInto("Usernames", new EasyMysqlProperty("Name", "Juan"), new EasyMysqlProperty("Name", "Pedro"));
+		mysql.push();
+		mysql.clear().selectFrom("Usernames").where(new EasyMysqlProperty("Name", "Pedro"));
 	}
 }

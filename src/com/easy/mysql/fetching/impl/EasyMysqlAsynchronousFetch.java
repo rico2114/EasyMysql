@@ -28,7 +28,7 @@ public class EasyMysqlAsynchronousFetch implements EasyMysqlFetch {
 	 * @param context	the mysql context
 	 */
 	public void fetch(final EasyMysql<EasyMysqlAsynchronousFetch> context) {
-		final ExecutorService service = context.getExecutors();
+		final ExecutorService service = context.getExecutor();
 		if (Objects.nonNull(service)) {
 			service.submit(new Runnable() {
 

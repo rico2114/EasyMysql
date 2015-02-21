@@ -35,9 +35,9 @@ public class EasyMysql<T extends EasyMysqlFetch> extends EasyMysqlFetchableStrea
 	private final Connection connection;
 	
 	/**
-	 * Represents the executors used for a synchronous works
+	 * Represents the executor used for asynchronous works
 	 */
-	private ExecutorService executors;
+	private ExecutorService executor;
 	
 	/**
 	 * Represents the handler that we are using for this stream
@@ -86,7 +86,7 @@ public class EasyMysql<T extends EasyMysqlFetch> extends EasyMysqlFetchableStrea
 	 * @return	this instance
 	 */
 	public EasyMysql<?> setExecutor() {
-		this.executors = Executors.newSingleThreadExecutor();
+		this.executor = Executors.newSingleThreadExecutor();
 		return this;
 	}
 	
@@ -99,11 +99,11 @@ public class EasyMysql<T extends EasyMysqlFetch> extends EasyMysqlFetchableStrea
 	}
 	
 	/**
-	 * Represents the executors
-	 * @return	the executors
+	 * Represents the executor
+	 * @return	the executor
 	 */
-	public ExecutorService getExecutors() {
-		return executors;
+	public ExecutorService getExecutor() {
+		return executor;
 	}
 
 	@Override

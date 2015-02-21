@@ -32,4 +32,11 @@ public class EasyMysqlAsynchronous extends EasyMysql<EasyMysqlAsynchronousFetch>
 		this(connection, handler, EasyMysqlAsynchronousFetch.getContext());
 	}
 
+	/**
+	 * Shuts down all the used resources for the asynchronous operations
+	 */
+	public void shutdown() {
+		getExecutors().shutdown();
+		System.out.println("[EasyMysql#shutdown] Executors were turned off correctly.");
+	}
 }

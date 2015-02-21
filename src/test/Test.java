@@ -18,31 +18,38 @@ import com.easy.mysql.streams.property.EasyMysqlProperty;
  */
 public class Test {
 	
-	private static final boolean TEST_ASYNCHRONOUS_FETCHING = true;
+	/**
+	 * Do we want to test asynchronous fetching or not
+	 */
+	private static final boolean TEST_ASYNCHRONOUS_FETCHING = false;
 	
 	public static void main(String[] args) {
 		// Set our connection
 		Connection connection = null;
 		try {
-			connection = DriverManager.getConnection("url", "username", "password");
+			// Connect to a desired location
+			connection = DriverManager.getConnection("jdbc:mysql://**.***.**.*:3306/databasename", "name", "password");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		// synchronous fetching
+		// synchronous fetching if configured
 		if (!TEST_ASYNCHRONOUS_FETCHING)
 			testSync(connection);
 		else
-		// asynchronous fetching
-		testAsync(connection);
+			// asynchronous fetching if configured
+			testAsync(connection);
 	}
 	
 	public static void testSync(final Connection connection) {
-		final EasyMysqlSynchronous sMysql = new EasyMysqlSynchronous(connection);
-		insertDataAndPrepareForFetching(sMysql);
-		final ResultSet rs = sMysql.getFetching().fetch(sMysql);
+		// Create our easy to use mySQL synchronous wrapper
+		final EasyMysqlSynchronous mysql = new EasyMysqlSynchronous(connection);
+		// Insert the data
+		insertDataAndPrepareForFetching(mysql);
+		// Fetch the data
+		final ResultSet resultSet = mysql.getFetching().fetch(mysql);
 		try {
-			while (rs.next()) {
-				// Grab details here, use rs as favour
+			if (resultSet.next()) {
+				System.out.println("[Test#testSync] " + resultSet.getString("Name") + " has an age of " + resultSet.getInt("Age") + ".");
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -50,37 +57,46 @@ public class Test {
 	}
 	
 	public static void testAsync(final Connection connection) {
+		// Create our handler <tt> Note that handlers are only used for a-synchronous operations </tt>
 		final EasyMysqlStreamHandler handler = new EasyMysqlStreamHandler() {
 
 			@Override
-			public void onPush(EasyMysqlStreamInterface stream) {
-				System.out.println("Sucessfully pushed");
+			public void onPush(final EasyMysqlAsynchronous context, EasyMysqlStreamInterface stream) {
+				System.out.println("[Test#testAsync] Sucessfully pushed.");
 			}
 
 			@Override
-			public void onFetch(ResultSet resultSet) {
-				System.out.println("A synchronous fetching");
-			}
-
-			@Override
-			public void onPushException(SQLException exception) {
-				System.out.println("exception during pushing!");
-			}
-
-			@Override
-			public void onFetchException(SQLException exception) {
-				System.out.println("exception during fetching");
-			}
-			
+			public void onFetch(final EasyMysqlAsynchronous context, ResultSet resultSet) {
+				try {
+					if (resultSet.next()) {
+						System.out.println("[Test#testAsync] " + resultSet.getString("Name") + " has an age of " + resultSet.getInt("Age") + ".");
+					}
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+				context.shutdown();
+			}			
 		};
-		final EasyMysqlAsynchronous asMysql = new EasyMysqlAsynchronous(connection, handler);
-		insertDataAndPrepareForFetching(asMysql);
-		asMysql.getFetching().fetch(asMysql);
+		// Create our easy to use mySQL a-synchronous wrapper
+		final EasyMysqlAsynchronous mysql = new EasyMysqlAsynchronous(connection, handler);
+		// Insert the data
+		insertDataAndPrepareForFetching(mysql);
+		// Fetch the data
+		mysql.getFetching().fetch(mysql);
 	}
 	
 	public static void insertDataAndPrepareForFetching(final EasyMysql<?> mysql) {
-		mysql.insertInto("Usernames", new EasyMysqlProperty("Name", "Juan"), new EasyMysqlProperty("Name", "Pedro"));
+		// INSERT JUAN
+		mysql.insertInto("Usernames", new EasyMysqlProperty("Name", "Juan"), new EasyMysqlProperty("Age", 17));
 		mysql.push();
-		mysql.clear().selectFrom("Usernames").where(new EasyMysqlProperty("Name", "Pedro"));
+		// CLEAR THE STREAM
+		mysql.clear();
+		// INSERT PEDRO
+		mysql.insertInto("Usernames", new EasyMysqlProperty("Name", "Pedro"), new EasyMysqlProperty("Age", 35));
+		mysql.push();
+		// CLEAR THE STREAM
+		mysql.clear();
+		// PREPARE FETCHING
+		mysql.selectFrom("Usernames").where(new EasyMysqlProperty("Name", "Pedro"));
 	}
 }

@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 import com.easy.mysql.fetching.EasyMysqlFetch;
 import com.easy.mysql.streams.EasyMysqlFetchableStream;
 import com.easy.mysql.streams.EasyMysqlStreamHandler;
+import com.easy.mysql.streams.impl.EasyMysqlAsynchronous;
 
 /**
  * Created with eclipse 27/01/2015 11:48:33 p. m.
@@ -67,11 +68,13 @@ public class EasyMysql<T extends EasyMysqlFetch> extends EasyMysqlFetchableStrea
 			try {
 				statement.executeUpdate(getStream().toString());
 				if (Objects.nonNull(handler)) {
-					handler.onPush(this);
+					if (this instanceof EasyMysqlAsynchronous)
+						handler.onPush((EasyMysqlAsynchronous) this, this);
 				}
 			} catch (SQLException e) {
 				if (Objects.nonNull(handler))
-					handler.onPushException(e);
+					if (this instanceof EasyMysqlAsynchronous)
+						handler.onPushException((EasyMysqlAsynchronous) this, e);
 				else
 					e.printStackTrace();
 			}

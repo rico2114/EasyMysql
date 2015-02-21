@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutorService;
 
 import com.easy.mysql.EasyMysql;
 import com.easy.mysql.fetching.EasyMysqlFetch;
+import com.easy.mysql.streams.impl.EasyMysqlAsynchronous;
 
 /**
  * Created with eclipse 28/01/2015 12:30:13 a. m.
@@ -42,9 +43,11 @@ public class EasyMysqlAsynchronousFetch implements EasyMysqlFetch {
 					if (Objects.nonNull(statement)) {
 						try {
 							final ResultSet resultSet = statement.executeQuery(context.getStream().toString());
-							context.getHandler().onFetch(resultSet);
+							if (context instanceof EasyMysqlAsynchronous)
+								context.getHandler().onFetch((EasyMysqlAsynchronous) context, resultSet);
 						} catch (SQLException e) {
-							context.getHandler().onFetchException(e);
+							if (context instanceof EasyMysqlAsynchronous)
+								context.getHandler().onFetchException((EasyMysqlAsynchronous) context, e);
 						}
 					}
 				}

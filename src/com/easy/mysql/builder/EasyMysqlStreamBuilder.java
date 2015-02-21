@@ -30,7 +30,7 @@ public abstract class EasyMysqlStreamBuilder implements EasyMysqlStreamInterface
 	 * @return	the stream builder for chaining
 	 */
 	public EasyMysqlStreamBuilder insertInto(final String tableName, final EasyMysqlProperty ... properties) {
-		stream.append("INSERT INTO " + tableName + "");
+		stream.append("INSERT INTO " + tableName + " (");
 		for (EasyMysqlProperty property : properties) {
 			if (Objects.nonNull(property)) {
 				stream.append(property.getKey() + ", ");

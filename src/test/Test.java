@@ -74,6 +74,7 @@ public class Test {
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
+				// shut down the worker thread
 				context.shutdown();
 			}			
 		};

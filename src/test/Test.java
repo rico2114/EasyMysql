@@ -25,13 +25,7 @@ public class Test {
 	
 	public static void main(String[] args) {
 		// Set our connection
-		Connection connection = null;
-		try {
-			// Connect to a desired location
-			connection = DriverManager.getConnection("jdbc:mysql://**.***.**.*:3306/databasename", "name", "password");
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		Connection connection = EasyMysql.open("host", "databaseName", "username", "password");
 		// synchronous fetching if configured
 		if (!TEST_ASYNCHRONOUS_FETCHING)
 			testSync(connection);

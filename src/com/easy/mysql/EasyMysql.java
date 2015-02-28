@@ -1,6 +1,7 @@
 package com.easy.mysql;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Objects;
@@ -53,6 +54,23 @@ public class EasyMysql<T extends EasyMysqlFetch> extends EasyMysqlFetchableStrea
 		super(fetch);
 		this.connection = connection;
 		this.handler = handler;
+	}
+	
+	/**
+	 * Attempts to statically create the connection
+	 * @param host	the host ip
+	 * @param databaseName	the database name
+	 * @param username	the username
+	 * @param password	the password
+	 * @return	the connection if it was established successfully, null if it wasn't
+	 */
+	public static final Connection open(final String host, final String databaseName, final String username, final String password) {
+		try {
+			return DriverManager.getConnection("jdbc:mysql://" + host + ":3306/" + databaseName, username, password);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	@Override

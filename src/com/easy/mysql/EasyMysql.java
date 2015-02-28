@@ -82,19 +82,27 @@ public class EasyMysql<T extends EasyMysqlFetch> extends EasyMysqlFetchableStrea
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		if (Objects.nonNull(statement)) {
-			try {
-				statement.executeUpdate(getStream().toString());
-				if (Objects.nonNull(handler)) {
-					if (this instanceof EasyMysqlAsynchronous)
-						handler.onPush((EasyMysqlAsynchronous) this, this);
+		try {
+			if (Objects.nonNull(statement)) {
+				try {
+					statement.executeUpdate(getStream().toString());
+					if (Objects.nonNull(handler)) {
+						if (this instanceof EasyMysqlAsynchronous)
+							handler.onPush((EasyMysqlAsynchronous) this, this);
+					}
+				} catch (SQLException e) {
+					if (Objects.nonNull(handler))
+						if (this instanceof EasyMysqlAsynchronous)
+							handler.onPushException((EasyMysqlAsynchronous) this, e);
+						else
+							e.printStackTrace();
 				}
+			}
+		} finally {
+			try {
+				statement.close();
 			} catch (SQLException e) {
-				if (Objects.nonNull(handler))
-					if (this instanceof EasyMysqlAsynchronous)
-						handler.onPushException((EasyMysqlAsynchronous) this, e);
-				else
-					e.printStackTrace();
+				e.printStackTrace();
 			}
 		}
 	}
